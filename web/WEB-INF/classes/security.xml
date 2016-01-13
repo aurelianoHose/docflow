@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://www.springframework.org/schema/beans"
+    xmlns:security="http://www.springframework.org/schema/security"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/security
+        http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+
+    <security:global-method-security pre-post-annotations="enabled" />
+
+    <security:http pattern="/login.html*" security="none"/>
+
+    <security:http pattern="/reguser/*" security="none"/>
+
+    <security:http pattern="/ws/*" security="none"/>
+
+    <security:http auto-config="true" use-expressions="true">
+        <security:intercept-url pattern="/**/*.html" access="hasRole('user')" />
+
+        <security:form-login login-page="/login.html" default-target-url="/index.html" authentication-failure-url="/login.html" />
+
+        <security:logout logout-url="/logout"/>
+
+        <security:remember-me />
+
+        <security:http-basic />
+    </security:http>
+
+    <security:authentication-manager>
+        <security:authentication-provider user-service-ref="userDetailsService">
+            <security:password-encoder hash="md5" />
+        </security:authentication-provider>
+    </security:authentication-manager>
+
+    <bean id="userDetailsService" class="com.netradio.service.UserDetailsServiceImpl">
+        <property name="userService" ref="userService"/>
+    </bean>
+</beans>

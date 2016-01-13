@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Stream">
+
+    <resultMap id="streamMap" type="Stream">
+        <id property="id" column="id" />
+        <result property="flow" column="flow"/>
+        <result property="link" column="link"/>
+        <result property="bitrade" column="bitrade"/>
+        <result property="codecId" column="codec_id"/>
+        <result property="icon" column="icon"/>
+        <result property="idCreator" column="user_id"/>
+        <result property="added" column="added"/>
+        <result property="modified" column="modified"/>
+        <result property="del" column="del"/>
+        <result property="actual" column="actual"/>
+    </resultMap>
+
+    <insert id="create">
+        <selectKey order="BEFORE" keyProperty="id" resultType="long" statementType="PREPARED">
+            SELECT nextval('flow_id_seq')
+        </selectKey>
+        INSERT INTO
+            flow (id, flow, link, bitrade, codec_id, icon, user_id, added, modified, del, actual)
+        VALUES
+            (#{id}, #{flow}, #{link}, #{bitrade}, #{codecId}, #{icon}, #{idCreator}, now(), now(), #{del}, #{actual})
+    </insert>
+
+    <select id="read" resultMap="streamMap">
+        SELECT * FROM flow WHERE id = #{id}
+    </select>
+
+    <update id="update">
+        UPDATE 
+            flow 
+        SET 
+            flow=#{flow}, link=#{link}, bitrade=#{bitrade}, codec_id=#{codecId}, icon=#{icon}, user_id=#{idCreator}, modified=now(), del=#{del}, actual=#{actual}
+        WHERE 
+            id=#{id}
+    </update>
+
+    <delete id="delete">
+        UPDATE 
+            flow
+        SET 
+            del='true', modified=now()
+        WHERE
+            id=#{id}
+    </delete>
+
+    <select id="findAll" resultMap="streamMap">
+    <![CDATA[
+        SELECT * FROM flow WHERE del='false' ORDER BY flow
+    ]]>
+    </select>
+    
+    <update id="setActual">
+        UPDATE flow SET actual = #{act}, modified = now() WHERE id = #{id}
+    </update>
+
+    <insert id="addFavorite">
+        INSERT INTO flows_users (user_id, flow_id) VALUES (#{uid}, #{fid})
+    </insert>
+
+    <delete id="delFavorite">
+        DELETE FROM flows_users WHERE user_id = #{uid} AND flow_id = #{fid}
+    </delete>
+
+    <select id="getFavorites" resultType="java.lang.Long">
+        SELECT fu.flow_id FROM flows_users fu
+        WHERE fu.user_id = #{uid}
+    </select>
+</mapper>

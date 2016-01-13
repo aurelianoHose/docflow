@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Genre">
+
+    <resultMap id="genreMap" type="Genre">
+        <id property="id" column="id" />
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="del" column="isDelete"/>
+        <result property="idCreator" column="user_id"/>
+        <result property="added" column="added"/>
+        <result property="modified" column="modified"/>
+    </resultMap>
+
+    <insert id="create">
+        <selectKey order="BEFORE" keyProperty="id" resultType="long" statementType="PREPARED">
+            SELECT nextval('public.genres_id_seq')
+        </selectKey>
+        INSERT INTO public.genres (id, name, description, user_id, added) VALUES (#{id}, #{name}, #{description}, #{idCreator}, now())
+    </insert>
+
+    <select id="read" resultMap="genreMap">
+        SELECT * FROM public.genres WHERE id = #{id}
+    </select>
+
+    <update id="update">
+        UPDATE public.genres SET name=#{name}, description=#{description}, user_id=#{idCreator}, modified=now() WHERE id=#{id}
+    </update>
+
+    <update id="delete">
+        UPDATE public.genres SET isdelete = true, modified = now() WHERE id = #{id}
+    </update>
+
+    <select id="findAll" resultMap="genreMap">
+        SELECT g.id, g.name, g.description, g.isdelete, g.user_id, u.name AS userName, g.added, g.modified
+        FROM genres g LEFT JOIN users u ON u.id = g.user_id
+        WHERE isdelete = false 
+        ORDER BY name
+    </select>
+
+    <select id="findAllInfo" resultMap="genreMap">
+        SELECT g.id, g.name
+        FROM genres g LEFT JOIN users u ON u.id = g.user_id
+        WHERE isdelete = false 
+        ORDER BY name
+    </select>
+
+    <select id="find" resultMap="genreMap">
+        SELECT g.id, g.name, g.description, g.isdelete, g.user_id, u.name AS userName, g.added, g.modified
+        FROM genres g LEFT JOIN users u ON u.id = g.user_id
+        WHERE UPPER(g.name) LIKE UPPER(#{name}) AND g.isdelete = false 
+        ORDER BY g.name
+    </select>
+
+    <select id="findByFlowId" resultMap="genreMap">
+        SELECT g.id, g.name , g.description
+        FROM flow f JOIN flows_genres fg ON f.id = fg.flow_id JOIN genres g ON g.id = fg.genre_id
+        WHERE f.id = #{id} 
+        ORDER BY g.name
+    </select>
+
+    <insert id="add">
+        INSERT INTO flows_genres (genre_id, flow_id) VALUES (#{gid}, #{fid})
+    </insert>
+
+    <delete id="deleteByFlowId">
+        DELETE FROM flows_genres WHERE flow_id = #{fid}
+    </delete>
+</mapper>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Option">
+
+    <resultMap type="Option" id="optionMap">
+        <id property="key" column="key"/>
+        <result property="value" column="value"/>
+        <result property="idType" column="id_type"/>
+    </resultMap>
+    
+    <insert id="create">
+            INSERT INTO configs (key, value, id_type) VALUES (#{key}, #{value},  #{idType})
+    </insert>
+
+    <select id="read" resultMap="optionMap">
+        SELECT * FROM configs WHERE key = #{key}
+    </select>
+
+    <update id="update">
+        UPDATE
+            configs
+        SET
+            value = #{value}
+        WHERE
+            key = #{key}
+    </update>
+
+    <select id="findAll" resultMap="optionMap">
+        SELECT * FROM configs
+    </select>
+
+    <select id="findByKey" resultMap="optionMap">
+        SELECT * FROM configs WHERE UPPER(key) LIKE UPPER(#{key}) ORDER BY key
+    </select>
+
+    <select id="findByType" resultMap="optionMap">
+        SELECT * FROM configs WHERE id_type = #{idType} ORDER BY key
+    </select>
+</mapper>

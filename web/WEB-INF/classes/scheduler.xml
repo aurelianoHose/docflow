@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:task="http://www.springframework.org/schema/task"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+    <task:scheduler id="scheduler" pool-size="1" />
+
+    <bean id="executor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor" />
+
+    <bean id = "audioThreadsChekerTask" class="com.netradio.task.AudioThreadsChekerTask" init-method="init">
+        <property name="scheduler" ref="scheduler" />
+        <property name="srv" ref="streamService" />
+        <property name="conf" ref="config" />
+        <property name="executor" ref="executor"/>
+    </bean>
+    
+</beans>

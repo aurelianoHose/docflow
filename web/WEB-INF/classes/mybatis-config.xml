@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <typeAliases>
+        <typeAlias alias="User" type="com.netradio.entity.User"/>
+        <typeAlias alias="Stream" type="com.netradio.entity.Stream"/>
+        <typeAlias alias="Role" type="com.netradio.entity.Role"/>
+        <typeAlias alias="Genre" type="com.netradio.entity.Genre"/>
+        <typeAlias alias="Codec" type="com.netradio.entity.Codec"/>
+        <typeAlias alias="StreamView" type="com.netradio.entity.StreamView"/>
+        <typeAlias alias="Option" type="com.netradio.entity.Option"/>
+        <typeAlias alias="TypeConfig" type="com.netradio.entity.TypeConfig"/>
+    </typeAliases>
+
+    <mappers>
+        <mapper resource="com/netradio/dao/mybatis/User.xml"/>
+        <mapper resource="com/netradio/dao/mybatis/Stream.xml"/>
+        <mapper resource="com/netradio/dao/mybatis/Role.xml"/>
+        <mapper resource="com/netradio/dao/mybatis/Genre.xml"/>
+        <mapper resource="com/netradio/dao/mybatis/Codec.xml"/>
+        <mapper resource="com/netradio/dao/mybatis/StreamView.xml"/>
+        <mapper resource="com/netradio/dao/mybatis/Option.xml"/>
+        <mapper resource="com/netradio/dao/mybatis/TypeConfig.xml"/>
+    </mappers>
+</configuration>

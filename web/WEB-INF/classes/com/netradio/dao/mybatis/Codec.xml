@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Codec">
+
+    <resultMap id="codecMap" type="Codec">
+        <id property="id" column="id" />
+        <result property="name" column="name"/>
+    </resultMap>
+
+    <insert id="create">
+        <selectKey order="BEFORE" keyProperty="id" resultType="long" statementType="PREPARED">
+            SELECT nextval('codecs_id_seq')
+        </selectKey>
+        INSERT INTO codecs (id, name) VALUES (#{id}, #{name})
+    </insert>
+
+    <select id="read" resultMap="codecMap">
+        SELECT * FROM codecs WHERE id = #{id}
+    </select>
+
+    <update id="update">
+        UPDATE codecs SET name=#{name} WHERE id=#{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM codecs WHERE id=#{id}
+    </delete>
+
+    <select id="findAll" resultMap="codecMap">
+        SELECT * FROM codecs
+    </select>
+
+</mapper>

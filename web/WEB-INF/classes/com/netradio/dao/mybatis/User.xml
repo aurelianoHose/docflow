@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="User">
+
+    <resultMap id="userMap" type="User">
+        <id property="id" column="id" />
+        <result property="idCreator" column="user_id"/>
+        <result property="added" column="added"/>
+        <result property="modified" column="modified"/>
+        <result property="name" column="name"/>
+        <result property="passwd" column="passwd"/>
+        <result property="del" column="del"/>
+    </resultMap>
+
+    <insert id="create">
+        <selectKey order="BEFORE" keyProperty="id" resultType="long" statementType="PREPARED">
+            SELECT nextval('users_id_seq')
+        </selectKey>
+            INSERT INTO users (id, name, passwd, user_id, added) VALUES (#{id}, #{name}, md5(#{passwd}), #{idCreator}, now())
+    </insert>
+
+    <select id="read" resultMap="userMap">
+        SELECT id, name, passwd FROM users WHERE id = #{id}
+    </select>
+
+    <update id="update">
+        UPDATE
+            users
+        SET
+            name = #{name}, user_id = #{idCreator}, modified = now()
+        WHERE
+            id = #{id}
+    </update>
+
+    <delete id="delete">
+        UPDATE
+            users
+        SET
+            del = 'TRUE'
+        WHERE
+            id = #{id}
+    </delete>
+
+    <select id="readByName" resultMap="userMap">
+        SELECT
+            u.id, u.name, u.passwd, u.user_id, uu.name AS userName, u.added, u.modified
+        FROM
+            users u LEFT JOIN users uu ON uu.id = u.user_id
+        WHERE
+            u.name = #{u.name}
+        ORDER BY name
+    </select>
+
+    <select id="findAll" resultMap="userMap">
+        SELECT
+            u.id, u.name, u.passwd, u.user_id, uu.name AS userName, u.added, u.modified
+        FROM 
+            users u LEFT JOIN users uu ON uu.id = u.user_id
+        WHERE
+            '1' not in (SELECT ur.role_id FROM users_roles ur WHERE u.id = ur.user_id) 
+            AND u.id > 1 
+            AND u.del = 'FALSE'
+        ORDER BY
+            u.name
+    </select>
+
+    <select id="findByName" resultMap="userMap">
+        SELECT
+            u.id, u.name, u.passwd, u.user_id, uu.name AS userName, u.added, u.modified
+        FROM 
+            users u LEFT JOIN users uu ON uu.id = u.user_id
+        WHERE
+            UPPER(u.name) LIKE UPPER(#{u.name})
+            AND '1' not in (SELECT ur.role_id FROM users_roles ur WHERE u.id = ur.user_id) 
+            AND u.id > 1 
+            AND u.del = 'FALSE'
+        ORDER BY
+            u.name
+    </select>
+
+    <select id="findByLogin" resultMap="userMap">
+        SELECT * 
+        FROM users 
+        WHERE login=#{login}
+    </select>
+
+    <delete id="deleteUsersRoles">
+        DELETE FROM users_roles WHERE user_id = #{id}
+    </delete>
+
+    <select id="findByIdAndPasswd" resultMap="userMap">
+        SELECT * FROM users WHERE passwd = md5(#{passwd}) AND id = #{id}
+    </select>
+
+    <update id="updatePasswd">
+        UPDATE
+            users
+        SET
+            passwd = md5(#{passwd}), user_id = #{idCreator}, modified = now()
+        WHERE
+            id = #{id}
+    </update>
+</mapper>

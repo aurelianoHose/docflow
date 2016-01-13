@@ -1,0 +1,130 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx" xmlns:task="http://www.springframework.org/schema/task"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+    <bean
+        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:/conf.properties" />
+    </bean>
+
+    <bean id="messageSource"
+        class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basename" value="messages" />
+    </bean>
+
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+        destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driverClassName}" />
+        <property name="url" value="${jdbc.url}" />
+        <property name="username" value="${jdbc.login}" />
+        <property name="password" value="${jdbc.passwd}" />
+    </bean>
+
+    <bean id="config" class="org.apache.commons.configuration.DatabaseConfiguration">
+        <constructor-arg index="0" ref="dataSource" />
+        <constructor-arg index="1" value="${conf.table}" />
+        <constructor-arg index="2" value="${conf.key}" />
+        <constructor-arg index="3" value="${conf.value}" />
+        <property name="delimiterParsingDisabled" value="true" />
+    </bean>
+
+    <import resource="classpath:/scheduler.xml" />
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="configLocation" value="classpath:/mybatis-config.xml" />
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="*" propagation="REQUIRED"
+                isolation="READ_COMMITTED" rollback-for="java.lang.Throwable" />
+        </tx:attributes>
+    </tx:advice>
+
+    <aop:config proxy-target-class="true">
+        <aop:pointcut id="transactionOperation"
+            expression="execution(* com.netradio.service..*ServiceImpl.*(..))" />
+        <aop:advisor pointcut-ref="transactionOperation"
+            advice-ref="txAdvice" />
+    </aop:config>
+
+    <bean id="dao" abstract="true"
+        class="org.mybatis.spring.support.SqlSessionDaoSupport">
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+
+    <bean id="optionDao" class="com.netradio.dao.mybatis.OptionDaoImpl" parent="dao" />
+    <bean id="userDao" class="com.netradio.dao.mybatis.UserDaoImpl" parent="dao" />
+    <bean id="roleDao" class="com.netradio.dao.mybatis.RoleDaoImpl" parent="dao" />
+    <bean id="genreDao" class="com.netradio.dao.mybatis.GenreDaoImpl" parent="dao" />
+    <bean id="codecDao" class="com.netradio.dao.mybatis.CodecDaoImpl" parent="dao" />
+    <bean id="streamDao" class="com.netradio.dao.mybatis.StreamDaoImpl" parent="dao" />
+    <bean id="streamViewMapper" class="com.netradio.dao.mybatis.StreamViewDaoImpl" parent="dao" >
+        <property name="conf" ref="config" />
+    </bean>
+    <bean id="typeConfigDao" class="com.netradio.dao.mybatis.TypeConfigDaoImpl" parent="dao" />
+
+    <bean id="userService" class="com.netradio.service.UserServiceImpl">
+        <property name="userDao" ref="userDao" />
+        <property name="roleDao" ref="roleDao" />
+    </bean>
+
+    <bean id="genreService" class="com.netradio.service.GenreServiceImpl">
+        <property name="dao" ref="genreDao" />
+    </bean>
+
+    <bean id="codecService" class="com.netradio.service.CodecServiceImpl">
+        <property name="dao" ref="codecDao" />
+    </bean>
+
+    <bean id="streamService" class="com.netradio.service.StreamServiceImpl">
+        <property name="prefix" value="${prefix}" />
+        <property name="streamDao" ref="streamDao" />
+        <property name="genreDao" ref="genreDao" />
+        <property name="svmapper" ref="streamViewMapper" />
+        <property name="conf" ref="config" />
+    </bean>
+
+    <bean id="optionService" class="com.netradio.service.OptionServiceImpl">
+        <property name="optionDao" ref="optionDao" />
+        <property name="typeConfigDao" ref="typeConfigDao" />
+    </bean>
+    <aop:aspectj-autoproxy />
+
+    <bean id="profileAspect" class="com.netradio.aspect.ProfileAspect" />
+
+    <bean id="cacheManager" class="net.sf.ehcache.CacheManager" factory-method="create" />
+
+    <bean id="genreWs" class="com.netradio.ws.GenreResource" >
+        <property name="srv" ref="genreService" />
+    </bean>
+
+    <bean id="usersWs" class="com.netradio.ws.UsersResource" >
+        <property name="srv" ref="userService" />
+    </bean>
+
+    <bean id="streamsWs" class="com.netradio.ws.StreamResource" >
+        <property name="streamService" ref="streamService" />
+        <property name="userService" ref="userService" />
+        <property name="prefix" value="${prefix}" />
+        <property name="cacheManager" ref="cacheManager" />
+    </bean>
+    
+    <bean class="com.netradio.junit4.StreamServiceJUnit4" id="streamServiceJUnit4" abstract="true">
+        <property name="prefix" value="${prefix}"></property>
+    </bean>
+
+    <bean class="com.netradio.util.ImageUtils" id="imageUtil">
+        <property name="conf" ref="config"></property>
+    </bean>
+</beans>

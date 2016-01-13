@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TypeConfig">
+
+    <resultMap type="TypeConfig" id="typeConfigMap">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="typeConfigMap">
+        SELECT * FROM types_configs
+    </select>
+
+    <select id="findByOptionKey" resultMap="typeConfigMap">
+        SELECT t.name 
+        FROM configs c LEFT JOIN types_configs t ON c.id_type = t.id
+        WHERE c.key = #{key} 
+    </select>
+</mapper>

@@ -1,0 +1,144 @@
+login.error=Ошибка: {0}
+user.notFound=Пользователь с id:{0} не найден!
+user.new=Добавить нового пользователя
+user.name=Имя пользователя:
+user=Пользователь
+users=Пользователи
+psswd=Пароль:
+user.list=Список пользователей
+
+genre=Жанр
+genres=Жанры
+genres.notFound=Жанры не найдены!
+genre.new=Добавить новый жанр
+genre.list=Список жанров
+
+codec=Кодек
+codecs=Кодеки
+codecs.notFound=Кодеки не найдены!
+codec.new=Добавить новый кодек
+
+flow=Поток
+fl=Поток:
+flows=Потоки
+flows.notFound=Потоки не найдены!
+flow.new=Добавить новый поток
+flows.list=Список потоков
+flow.actual=Актуальный:
+flows.myflows=Любимые 
+
+delete=Удалить
+save=Сохранить
+
+link=Адрес:
+bitrate=Битрейт:
+codec=Кодек:
+image=Эмблема:
+mess=Вы уверены, что хотите удалить запись?
+
+flow.flow.empty=Название потока не может быть пустым
+flow.link.empty=Ссылка не может быть пустой
+flow.bitrade.empty=Битрейт не может быть пустым
+
+previous=Предыдущая
+next=Следующая
+
+login.empty=Имя не может быть пустым
+passwd.error=Некорректный пароль, используйте от 3 до 15 символов (цифры, латинские буквы, символы "_ -")
+roles.empty=Задайте роль
+
+login.exists=Данное имя занято
+genre.exists=Имя жанра существует
+
+genre.wrong=Название жанра не может быть пустым 
+roles=Роли:
+
+footer.location=Расположение 
+footer.address1=Проспект Строителей, 11А
+footer.address2=Беларусь, г. Витебск
+footer.around=Мы в интернете
+footer.copyrigth=Copyright &copy; 2015 - NetRadio
+footer.aboutus=Мы команда epam. Наша цель - предоставлять вам качественный сервис
+footer.aboutNetradio=О нас
+about.about=О Проекте
+about.about1=NetRadio - проект, созданный небольшой командой с целью предоставить быстрый и удобный доступ пользователям к сотням, тысячам и миллионам радиостанций со всего мира.
+about.about2=NetRadio позволяет людям найти и слушать то, что для них наиболее важно — от спорта до новостей, музыки, разговоров. NetRadio обеспечивает слушателям доступ к большому количеству реальных радиостанций и подкастов потокового вещания со всех континентов.
+
+login.login=Логин
+login.Login=Вход
+login.pass=Пароль
+login.logon=Вход
+login.reg=Регистрация
+
+description=Описание
+created.by=Запись создал:
+time.adding=Время создания:
+modification.time=Время изменения:
+login.invalid=Некорректное имя пользователя, используйте от 3 до 15 символов (цифры, латинские буквы, символы "_ -")
+
+flows.actual=Актуальные Потоки
+flows.noActual=Неактуальные Потоки
+
+bitrade.enter=Введите числа
+link.enter=Введите ссылку на прослушивание
+flow.enter=Введите название
+genre.enter=Введите название
+description.enter=Введите описание
+login.enter=Введите логин
+passwd.enter=Введите пароль
+passwd.empty=Пароль не может быть пустым
+
+options.options=Конфигурации
+options.key=Опция
+
+options.value=Значение
+options.descr=Описание
+
+modal.close=Закрыть
+modal.ok=Принять
+
+userNamePattern=Регулярное выражение для имени пользователя
+userPasswdPattern=Регулярное выражение для пароля пользователя
+crontab=Выражение cron триггера для расписания проверки актуальности потоков
+poolSize=Размер пула потоков для проверки актуальности радиостанций
+countStreams=Колличество радиостанций выводимых на страницу
+s=Размер картинки по стандарту 's'
+m=Размер картинки по стандарту 'm'
+l=Размер картинки по стандарту 'l'
+xl=Размер картинки по стандарту 'xl'
+
+userNamePattern1=userNamePattern
+userPasswdPattern1=userPasswdPattern
+crontab1=crontab
+poolSize1=poolSize
+countStreams1=countStreams
+s1=s
+m1=m
+l1=l
+xl1=xl
+
+error.access=Доступ запрещен
+error.text=Если хотите войти под другим именем нажмите кнопку Назад.
+error.button=Назад
+
+cron.error=Некорректное cron выражение
+regexp.error=Некорректное регулярное выражение выражение
+
+psswd.new=Новый пароль
+psswd.old=Старый пароль
+passwd.invalid=Неправильный старый пароль
+messageSuccess.login=Имя успешно изменено
+messageSuccess.passwd=Пароль успешно изменён
+psswd.edit=Изменить пароль
+count.error=Неверный формат(только числа)
+psswd.confirm=Подвердите пароль
+psswd.invalidConfirm=Новый пароль не подтверждён
+
+new.user=Новый Пользователь
+new.genre=Новый Жанр
+new.flow=Новый Поток
+options=Опции
+exit=Выход
+quick.search=Быстрый Поиск
+
+count.errorNegative=Отрицательное число

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="StreamView">
+
+    <resultMap id="genreMap" type="Genre">
+        <id property="id" column="id" />
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="del" column="isDelete"/>
+        <result property="idCreator" column="user_id"/>
+        <result property="added" column="added"/>
+        <result property="modified" column="modified"/>
+    </resultMap>
+
+    <resultMap type="StreamView" id="streamViewMap">
+        <id property="id" column="id" />
+        <result property="flow" column="flow" />
+        <result property="link" column="link" />
+        <result property="codecId" column="codec_id" />
+        <result property="bitrade" column="bitrade" />
+        <result property="icon" column="icon" />
+        <result property="codecName" column="codecName" />
+        <result property="userName" column="userName"/>
+        <result property="added" column="added"/>
+        <result property="modified" column="modified"/>
+        <result property="idCreator" column="user_id" />
+        <result property="actual" column="actual"/>
+        <collection property="genres" column="id" select="findByStreamId"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="streamViewMap">
+        SELECT
+            f.id, f.flow, f.link, f.bitrade, f.codec_id, f.icon, c.name AS codecName, u.name AS userName, f.added, f.modified, f.user_id, f.actual
+        FROM
+            flow f 
+        LEFT JOIN codecs c ON c.id = f.codec_id
+        LEFT JOIN users u ON u.id = f.user_id
+        WHERE 
+            f.del = false AND f.actual = #{act}
+        ORDER BY
+            f.flow LIMIT #{count} OFFSET #{count} * #{page}
+    </select>
+
+    <select id="find" resultMap="streamViewMap">
+        SELECT 
+        DISTINCT ON (f.flow)
+            f.id, f.flow, f.link, f.bitrade, f.codec_id, f.icon, c.name AS codecName, u.name AS userName, f.added, f.modified, f.user_id, f.actual
+        FROM 
+            flow f
+        LEFT JOIN codecs c ON c.id = f.codec_id
+        LEFT JOIN users u ON u.id = f.user_id
+        LEFT JOIN flows_genres fg ON f.id=fg.flow_id
+        LEFT JOIN genres g ON fg.genre_id=g.id
+        <where>
+            f.del = false AND f.actual = #{act}
+            <if test="name != null">
+                AND UPPER(f.flow) LIKE UPPER(#{name})
+            </if>
+            <if test="genre != null">
+                AND g.name=#{genre} AND fg.genre_id=g.id
+            </if>
+        </where> 
+        ORDER BY
+            f.flow LIMIT #{count} OFFSET #{count} * #{page}
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT count(DISTINCT f.*) 
+        FROM 
+            flow f
+        LEFT JOIN codecs c ON c.id = f.codec_id
+        LEFT JOIN flows_genres fg ON f.id=fg.flow_id
+        LEFT JOIN genres g ON fg.genre_id=g.id
+        <where>
+            f.del = false AND f.actual = #{act}
+            <if test="name != null">
+                AND UPPER(f.flow) LIKE UPPER(#{name})
+            </if>
+            <if test="genre != null">
+                AND g.name=#{genre} AND fg.genre_id=g.id
+            </if>
+        </where>
+    </select>
+
+    <select id="countFavorites" resultType="int">
+        SELECT count(DISTINCT f.*)
+        FROM 
+            flow f
+        LEFT JOIN codecs c ON c.id = f.codec_id
+        LEFT JOIN users u ON u.id = f.user_id
+        LEFT JOIN flows_users fu ON f.id=fu.flow_id
+        LEFT JOIN flows_genres fg ON f.id=fg.flow_id
+        LEFT JOIN genres g ON fg.genre_id=g.id
+        <where>
+            fu.user_id=#{usr} AND f.del = false AND f.actual = #{act}
+            <if test="name != null">
+                AND UPPER(f.flow) LIKE UPPER(#{name})
+            </if>
+            <if test="genre != null">
+                AND g.name=#{genre} AND fg.genre_id=g.id
+            </if>
+        </where> 
+    </select>
+
+    <select id="findByFavorites" resultMap="streamViewMap">
+        SELECT 
+        DISTINCT ON (f.flow)
+            f.id, f.flow, f.link, f.bitrade, f.codec_id, f.icon, c.name AS codecName, u.name AS userName, f.added, f.modified, f.user_id, f.actual
+        FROM 
+            flow f
+        LEFT JOIN codecs c ON c.id = f.codec_id
+        LEFT JOIN users u ON u.id = f.user_id
+        LEFT JOIN flows_users fu ON f.id=fu.flow_id
+        LEFT JOIN flows_genres fg ON f.id=fg.flow_id
+        LEFT JOIN genres g ON fg.genre_id=g.id
+        <where>
+            fu.user_id=#{usr} AND f.del = false AND f.actual = #{act}
+            <if test="name != null">
+                AND UPPER(f.flow) LIKE UPPER(#{name})
+            </if>
+            <if test="genre != null">
+                AND g.name=#{genre} AND fg.genre_id=g.id
+            </if>
+        </where> 
+        ORDER BY
+            f.flow LIMIT #{count} OFFSET #{count} * #{page}
+    </select>
+
+    <select id="findByGenre" resultMap="streamViewMap">
+        SELECT 
+            f.id, f.flow, f.link, f.bitrade, f.codec_id, f.icon, c.name AS codecName, u.name AS userName, f.added, f.modified, f.user_id, f.actual
+        FROM 
+            flow f
+        LEFT JOIN codecs c ON c.id = f.codec_id
+        LEFT JOIN users u ON u.id = f.user_id
+        LEFT JOIN flows_genres fg ON f.id=fg.flow_id
+        WHERE 
+            fg.genre_id=#{genre} AND f.del = false AND f.actual = #{act}
+        ORDER BY
+            f.flow LIMIT #{count} OFFSET #{count} * #{page}
+    </select>
+
+    <select id="findByGenres" resultMap="streamViewMap" parameterType="map">
+        SELECT DISTINCT ON (f.flow) f.id, f.flow
+        FROM flow f LEFT JOIN flows_genres fg ON f.id=fg.flow_id
+        <where> fg.genre_id IN 
+            <foreach item="gid" collection="gids" open="(" separator="," close=")">
+                #{gid}
+            </foreach>
+            AND f.del=false AND f.actual=true
+        </where>
+    </select>
+
+    <select id="findByStreamId" parameterType="int" resultMap="genreMap">
+        SELECT g.*
+        FROM flow f JOIN flows_genres fg ON f.id = fg.flow_id JOIN genres g ON g.id = fg.genre_id
+        WHERE f.id = #{id} 
+        ORDER BY g.name
+    </select>
+
+    <select id="findSreamInfoById" resultMap="streamViewMap">
+        SELECT
+            f.id, f.flow, f.link, f.bitrade, c.name AS codecName
+        FROM
+            flow f 
+        LEFT JOIN 
+            codecs c ON c.id = f.codec_id
+        WHERE 
+            f.del = 'false' AND f.actual = 'true' AND f.id = #{id}
+    </select>
+</mapper>
